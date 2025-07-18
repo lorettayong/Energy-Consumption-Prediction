@@ -58,7 +58,7 @@ This dataset provides a long, high-frequency time series ideal for identifying s
 # Project Phases
 
 ## Phase 1: Data Preprocessing and Exploratory Data Analysis (EDA)
-* **Objective:** Load the dataset, understand its structure and content, handle initial data quality issues, convert the timestamp to the correct format, and perform some initial visualisations to gain insights to the energy consumption patterns.
+* **Objectives:** Load the dataset, understand its structure and content, handle initial data quality issues, convert the timestamp to the correct format, and perform some initial visualisations to gain insights to the energy consumption patterns.
 * **Key Activities:**
   * Loaded `PJME_hourly.csv` file into a Pandas Dataframe.
   * Conducted initial checks using `df.head()`, `df.info()`, and `df.describe()` to understand the data structure, types, and basic statistics.
@@ -73,9 +73,17 @@ This dataset provides a long, high-frequency time series ideal for identifying s
   * Clear daily seasonality: Within each 24-hour cycle, consumption follows a predictable pattern, often with peaks in the mornings and evenings, and troughs in the very early hours of the morning.
   * The overall yearly trend appears relatively stable, although specific years might show minor variations.
 
+## Phase 2: Feature Engineering
+* **Objective:** Create rich predictive features from the available energy consumption data and integrate critical external information.
+* **Key Activities:**
+  * Extracted components from the `DatetimeIndex` such as `hour_of_day`, `day_of_week`, `week_of_year`, `month`, `quarter`, `year`, and `is_weekend` (a binary flag).
+  * Generated lagged features, including `lag_1_hour`, `lag_24_hour`, `lag_168_hour`, which represent past consumption values and are highly predictive of future demand.
+  * Integrated features indicating US federal public holidays, which typically exhibit distinct energy consumption patterns due to reduction in business and industrial activities.
+  * Sourced and incorporated historical temperature data corresponding to a selected location within the PJM region, Chicago. These include current temperatures, potentially lagged temperatures, and various temperature-derived features such as rolling averages and squared temperatures, given the strong correlation between temperature and demand for energy.
+
 # Next Steps (Future Work)
-* **Feature Engineering:** Create new predictive features from the existing `DatetimeIndex` of the energy consumption data, including the extraction of components such as hour of the day, day of the week, month, quarter, year, and the creation of flags for weekends.
-* **External Data Integration:** Source and incorporate historical temperature data corresponding to the PJM region to demonstrate the correlation between temperature and energy demand, and integrate features indicating national public holidays to exhibit distinct patterns of energy consumption.
+* ~~**Feature Engineering:** Create new predictive features from the existing `DatetimeIndex` of the energy consumption data, including the extraction of components such as hour of the day, day of the week, month, quarter, year, and the creation of flags for weekends.~~
+* ~~**External Data Integration:** Source and incorporate historical temperature data corresponding to the PJM region to demonstrate the correlation between temperature and energy demand, and integrate features indicating national public holidays to exhibit distinct patterns of energy consumption.~~
 * **Model Building:** Select suitable regression models for time series forecasting, such as XGBoost Regressor, LightGBM Regressor, and Facebook Prophet, train these models on the prepared training data, and conduct hyperparameter tuning using techniques such as `GridSearchCV` and `RandomizedSearchCV` combined with a time series-aware cross-validation strategy.
 * **Model Evaluation:** Perform an initial evaluation of their performance using metrics like Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), and R-squared ($R^2$) on the test set.
 * **Model Deployment:** Develop a simple and interactive web application to showcase the practical accessibility of the trained forecasting model.
