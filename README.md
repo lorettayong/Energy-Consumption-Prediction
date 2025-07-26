@@ -18,6 +18,8 @@ The primary dataset used in this project is the **PJME Hourly Energy Consumption
 
 External temperature data is also fetched from the Open-Meteo API.
 
+* **Source: [Open-Meteo Historical Weather API](https://open-meteo.com/en/docs/historical-weather-api)
+
 # Project Structure
 - `energy-prediction.ipynb`: Jupyter Notebook containing the data loading, exploratory data analysis (EDA), model building, and evaluation steps.
 - `requirements.txt`: Lists all the Python libraries and their versions required to run this project.
@@ -157,8 +159,6 @@ Features related to the hour of the day, such as `hour_of_day`, `hour_sin` and `
 
 Despite being newly integrated, temperature-based features like `rolling_72_temp_avg`, `lag_24_temp`, and `temp_squared` have quickly proven their values, indicating temperature to be a crucial external driver of energy demand.
 
-<<<<<<< HEAD
-=======
 ## Phase 4: Advanced Feature Engineering
 * **Objective:** Capture more nuanced, complex, and high-impact relationships within the energy consumption data by engineering sophisticated features, with the aim of providing the predictive model with a richer understanding of demand drivers beyond basic time-series components and leading to improved accuracy and robustness.
 * **Key Activities:**
