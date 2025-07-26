@@ -69,6 +69,9 @@ This dataset provides a long, high-frequency time series ideal for identifying s
   * Generated a complete, continuous hourly `DatetimeIndex` that spans the entire data range, and `re-index`ed the DataFrame to this full range by introducing explicit `NaN` values for any previously missing hours. This is needed as the dataset exhibited instances of skipped hours (e.g. 2-hour gaps), primarily due to Daylight Saving Time (DST) changes.
   * Interpolated the `NaN` values that were introduced through reindexing (to represent the skipped hours) using a linear method. This ensures a perfectly continuous and regularly spaced hourly time series, which is a prerequisite for many time series modelling techniques.
   * Plotted the `PJME_MW` consumption over the entire period and in sections of the time series (in specific month and week) to visualise long-term trends and observe granular weekly and daily seasonality more clearly.
+    * ![PJME Hourly Energy Consumption (MW)](images/ph1_entire_time_series.png)
+    * ![PJME Hourly Energy Consumption in March 2015](images/ph1_zoom_period_time_series.png)
+    * ![PJME Hourly Energy Consumption in the First Week of March 2015](images/ph1_zoom_week_time_series.png)
 * **Observations from EDA:**
   * Strong annual seasonality: Energy demand shows clear yearly cycles, typically peaking during summer (for air conditioning purposes) and winter (for heating purposes), with lower demands in spring and autumn.
   * Distinct weekly seasonality: Weekday consumption patterns differ significantly from weekends, with lower demands usually on Saturdays and Sundays.
@@ -82,6 +85,18 @@ This dataset provides a long, high-frequency time series ideal for identifying s
   * Generated lagged features, including `lag_1_hour`, `lag_24_hour`, `lag_168_hour`, which represent past consumption values and are highly predictive of future demand.
   * Integrated features indicating US federal public holidays, which typically exhibit distinct energy consumption patterns due to reduction in business and industrial activities.
   * Sourced and incorporated historical temperature data corresponding to a selected location within the PJM region, Chicago. These include current temperatures, potentially lagged temperatures, and various temperature-derived features such as rolling averages and squared temperatures, given the strong correlation between temperature and demand for energy.
+<<<<<<< HEAD
+=======
+  * Visualised engineered time-based and cyclical features to gain insights into consumption patterns and trends.
+    * ![PJME_MW Consumption in 2016 and 2017](images/ph2_pjme_mw_over_time.png)
+    * ![PJME_MW Consumption by Hour of Day (Weekday vs Weekend)](images/ph2_pjme_mw_vs_hour_of_day.png)
+    * ![PJME_MW vs Temperature](images/ph2_pjme_mw_vs_temperature.png)
+    * ![Average PJME_MW by Hour of Day and Day of Week](images/ph2_average_pjme_mw_by_hour_and_day_of_week.png)
+* **Observations from visualisation:**
+  * JME_MW over time: This plot for a specific two-year period (2016-2017) clearly illustrates the pronounced annual seasonality in energy consumption, with noticeable peaks during summer and winter months and troughs in spring and autumn. It provides a focused view of the consistent cyclical behavior of demand year-over-year within a manageable timeframe, without the overwhelming detail of the entire dataset.
+  * PJME_MW by Hour of Day: This visual effectively highlights the distinct daily consumption profiles when differentiated by weekend status. Weekdays generally show higher overall demand with characteristic morning and evening peaks corresponding to typical work/business hours. In contrast, weekends exhibit significantly lower overall demand, and their daily patterns are often flatter with less pronounced peaks, reflecting reduced commercial and industrial activity.
+  * PJME_MW vs Temperature: The scatter plot clearly demonstrates a non-linear, typically "U-shaped" or "V-shaped" relationship between temperature and energy demand. Demand is at its lowest within a comfortable moderate temperature range (the bottom of the "U"). As temperatures deviate from this comfort zone (becoming either very cold or very hot), energy consumption sharply increases due to the activation of heating and cooling systems, respectively.
+  * Average PJME_MW by Hour of Day and Day of Week: This heatmap provides a powerful, consolidated view of combined daily and weekly energy consumption patterns. It immediately identifies periods of highest demand (typically weekday afternoons/evenings, indicating peak commercial and residential activities) and lowest demand (often early weekend mornings when activities are minimal). The intensity of the color clearly shows how consumption varies hour-by-hour across the entire week.
 
 ## Phase 3: Model Selection, Training and Optimisation
 * **Objective:** Establish initial baseline performance for the energy consumption prediction model by leveraging on a foundational set of features and exploring initial model capabilities to set a benchmark for future improvements.
@@ -102,10 +117,12 @@ This dataset provides a long, high-frequency time series ideal for identifying s
     * RMSE: 339.45
     * MAE: 248.73
     * R-squared: 0.9969272384939307
+    * ![XGBoost Baseline Model: Actual vs Predicted Energy Consumption](images/ph3_xgboost_baseline_model.png)
   * LightGBM:*
     * RMSE: 335.96
     * MAE: 248.34
     * R-squared: 0.996990114808874
+    * ![LightGBM Baseline Model: Actual vs Predicted Energy Consumption](images/ph3_lightgbm_baseline_model.png)
 * **Feature Importance Insights:** An initial analysis of feature importance from the baseline models provided valuable insights into which features were most influential in predicting energy consumption:
   * Top 10 Feature Importance from Baseline XGBoost Model:
     1. lag_1_hour: 0.905533
@@ -118,6 +135,7 @@ This dataset provides a long, high-frequency time series ideal for identifying s
     8. lag_24_hour: 0.002408
     9. lag_24_temp: 0.001814
     10. temp_squared: 0.001745
+    * ![XGBoost Feature Importances](images/ph3_top_10_features_xgboost_baseline_model.png)
   * Top 10 Feature Importance from Baseline LightGBM Model:
     1. hour_of_day: 4701
     2. lag_1_hour: 4399
@@ -129,7 +147,7 @@ This dataset provides a long, high-frequency time series ideal for identifying s
     8. hour_cos: 1618
     9. lag_24_hour: 1593
     10. day_of_year: 1557
-
+    * ![LightGBM Feature Importances](images/ph3_top_10_features_lightgbm_baseline_model.png)
 **Key takeaways from Feature Importance:**
 
 The immediate previous hour's consumption (`lag_1_hour`) is clearly the most dominant feature for both models, underscoring the strong autocorrelation in energy demand.
@@ -137,6 +155,29 @@ The immediate previous hour's consumption (`lag_1_hour`) is clearly the most dom
 Features related to the hour of the day, such as `hour_of_day`, `hour_sin` and `hour_cos`, are also consistently ranked high, thus confirming the critical role that daily patterns play in energy consumption predictions.
 
 Despite being newly integrated, temperature-based features like `rolling_72_temp_avg`, `lag_24_temp`, and `temp_squared` have quickly proven their values, indicating temperature to be a crucial external driver of energy demand.
+
+<<<<<<< HEAD
+=======
+## Phase 4: Advanced Feature Engineering
+* **Objective:** Capture more nuanced, complex, and high-impact relationships within the energy consumption data by engineering sophisticated features, with the aim of providing the predictive model with a richer understanding of demand drivers beyond basic time-series components and leading to improved accuracy and robustness.
+* **Key Activities:**
+  * Engineered sophisticated temperature-based features, including Heating Degree Days (`HDD`) and Cooling Degree Days (`CDD`), to model the threshold-dependent impact of temperature on heating and cooling demand.
+  * Calculated rolling means (e.g. `PJME_MW_rolling_24_hr_mean`) to smooth out short-term noise and reveal underlying trends, and rolling standard deviations (e.g. `PJME_MW_rolling_24_hr_std`) to quantify and identify periods of increased volatility or variability in energy demand.
+  * Constructed novel interaction features by multiplying existing variables (e.g. `hour_of_day_x_is_weekend`). This allowed for modeling conditional relationships, where the effect of one variable on energy demand depends on the state of another.
+  * Created comprehensive visualisations for these newly engineered features to visually confirm patterns, assess relationships with energy demand, and gain deeper insights into complex demand drivers.
+    * ![PJME_MW vs Heating Degree Days (HDD)](images/ph4_pjme_mw_vs_hdd.png)
+    * ![PJME_MW vs Cooling Degree Days (CDD)](images/ph4_pjme_mw_vs_cdd.png)
+    * ![PJME_MW vs 24-Hour Rolling Mean (01 June to 31 August 2017)](images/ph4_pjme_mw_vs_24_hr_rolling_mean.png)
+    * ![PJME_MW vs 24-Hour Rolling Standard Deviation (01 June to 31 August 2017)](images/ph4_pjme_mw_vs_24_hr_rolling_std_dev.png)
+    * ![PJME_MW by Holiday Status](images/ph4_pjme_mw_vs_is_holiday.png)
+    * ![PJME_MW vs Cooling Degree Days (CDD) by Weekend Status](images/ph4_pjme_mw_vs_cdd_by_is_weekend.png)
+* **Observations from visualisation:**
+  * PJME_MW vs Heating Degree Days (HDD): There is a clear positive linear relationship between Heating Degree Days (HDD) and energy consumption. As HDD values increase (due to colder temperatures and greater heating needs), PJME_MW demand also tends to increase significantly, indicating a strong correlation.
+  * PJME_MW vs Cooling Degree Days (CDD): Similar to HDD, there's a strong positive linear relationship between CDD and PJME_MW. As CDD values rise (indicating hotter temperatures and greater cooling needs), energy demand generally increases sharply. This correlation is often even stronger than with HDD in some regions.
+  * PJME_MW vs 24-Hour Rolling Mean: The 24-hour rolling mean effectively smooths out short-term fluctuations in the actual `PJME_MW` data. It clearly reveals the underlying daily and weekly trends, making the broader patterns and seasonality much more apparent than the raw data alone. This helps in understanding the baseline demand and its general movement.
+  * PJME_MW 24-Hour Rolling Standard Deviation: This visual highlights periods of higher or lower volatility in energy demand. Peaks in the rolling standard deviation indicate times when energy consumption is more variable or fluctuating (such as during rapid weather shifts, major events, or periods of high uncertainty), while lower values suggest more stable demand.
+  * PJME_MW by Is_Holiday: The boxplot distinctly shows a noticeable difference in energy consumption between holidays and non-holidays. Typically, energy demand is significantly lower on holidays as compared to regular non-holiday days, reflecting reduced business, industrial, and possibly changed residential activity.
+  * PJME_MW vs CDD by Is_Weekend: Coloured by weekend status, this scatter plot reveals whether the relationship between CDD and energy consumption differs between weekdays and weekends. It is observed that there are distinct clusters or even different slopes in the data points for "No" (weekdays) versus "Yes" (weekends), indicating that cooling demand responds differently or is driven by different activity levels on those respective days.
 
 # Next Steps (Future Work)
 * ~~**Feature Engineering:** Create new predictive features from the existing `DatetimeIndex` of the energy consumption data, including the extraction of components such as hour of the day, day of the week, month, quarter, year, and the creation of flags for weekends.~~
