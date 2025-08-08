@@ -100,7 +100,7 @@ This dataset provides a long, high-frequency time series ideal for identifying s
   * PJME_MW vs Temperature: The scatter plot clearly demonstrates a non-linear, typically "U-shaped" or "V-shaped" relationship between temperature and energy demand. Demand is at its lowest within a comfortable moderate temperature range (the bottom of the "U"). As temperatures deviate from this comfort zone (becoming either very cold or very hot), energy consumption sharply increases due to the activation of heating and cooling systems, respectively.
   * Average PJME_MW by Hour of Day and Day of Week: This heatmap provides a powerful, consolidated view of combined daily and weekly energy consumption patterns. It immediately identifies periods of highest demand (typically weekday afternoons/evenings, indicating peak commercial and residential activities) and lowest demand (often early weekend mornings when activities are minimal). The intensity of the color clearly shows how consumption varies hour-by-hour across the entire week.
 
-## Phase 3: Model Selection, Training and Optimisation
+## Phase 3: Model Selection and Training
 * **Objective:** Establish initial baseline performance for the energy consumption prediction model by leveraging on a foundational set of features and exploring initial model capabilities to set a benchmark for future improvements.
 * **Key Activities:**
   * Employed a chronological data split to divide the dataset into training and test sets. This approach ensures that the model is always trained on historical data and evaluated on future, unseen data to provide a realistic assessment of its predictive capabilities.
@@ -151,7 +151,11 @@ This dataset provides a long, high-frequency time series ideal for identifying s
     10. day_of_year: 1557
     ![LightGBM Feature Importances](images/ph3_top_10_features_lightgbm_baseline_model.png)
 
-**Key takeaways from Feature Importance:**
+**Model Performance Comparison**
+
+Both XGBoost and LightGBM models performed comparably well, with the latter baseline showing a slight edge in both RMSE and MSE. This initial comparison will serve as the benchmark for the hyperparameter tuning conducted in the subsequent phase.
+
+**Key takeaways from Feature Importance**
 
 The immediate previous hour's consumption (`lag_1_hour`) is clearly the most dominant feature for both models, underscoring the strong autocorrelation in energy demand.
 
@@ -180,12 +184,40 @@ Despite being newly integrated, temperature-based features like `rolling_72_temp
   * PJME_MW by Is_Holiday: The boxplot distinctly shows a noticeable difference in energy consumption between holidays and non-holidays. Typically, energy demand is significantly lower on holidays as compared to regular non-holiday days, reflecting reduced business, industrial, and possibly changed residential activity.
   * PJME_MW vs CDD by Is_Weekend: Coloured by weekend status, this scatter plot reveals whether the relationship between CDD and energy consumption differs between weekdays and weekends. It is observed that there are distinct clusters or even different slopes in the data points for "No" (weekdays) versus "Yes" (weekends), indicating that cooling demand responds differently or is driven by different activity levels on those respective days.
 
+## Phase 5: Hyperparameter Tuning and Optimisation
+* **Objective:** Systematically enhance the predictive performance of our chosen models, XGBoost and LightGBM, by finding their optimal hyperparameter configurations to achieve a more robust and generalised model that performs well on unseen time series data.
+* **Key Activities:**
+  * Implemented time series cross-validation instead of a single train-test split, which is crucial for time series forecasting as it maintains the chronological order of the data, preventing data leakage and providing a more reliable evaluation of model performance across different time periods.
+  * Used the Optuna library to automate the hyperparameter search process, which efficiently explores the hyperparameter space using advanced optimisation algorithms, identifying combinations that minimise the Root Mean Squared Error (RMSE) of the models.
+  * Incorporated all previously engineered features, including cyclical time features, lag features (e.g. `lag_1_hour`), rolling statistics (e.g. `PJME_MW_rolling_24_hr_mean`), and interactive features (e.g. `hour_of_day_x_is_weekend`) to ensure the models leverage the full breadth of available information.
+  * Generated visual comparisons of the baseline and tuned models, including charts showing the predicted vs actual values for the tuned models, as well as a direct comparison chart of both the baseline and tuned models to illustrate the impact of hyperparameter tuning.
+    ![XGBoost Tuned Model: Actual vs Predicted Energy Consumption](images/ph5_xgboost_tuned_model.png)
+    ![LightGBM Tuned Model: Actual vs Predicted Energy Consumption](images/ph5_lgbm_tuned_model.png)
+    ![Comparison of Actual Energy Consumption vs Model Predictions](images/ph5_baseline_tuned_model_comparison.png)
+
+**Model Performance Comparison (After Tuning)**
+
+The hyperparameter tuning process yielded varying degrees of improvement for the models. All experiments in this phase were conducted on Google Colab, which required explicit installation of libraries such as `xgboost`, `lightgbm`, and `optuna` at the start of each session.
+
+| Model             | RMSE      | MSE       | R^2     |
+|:------------------|:----------|:----------|:--------|
+| Baseline XGBoost  | 339.44611 | 248.72794 | 0.99693 |
+| Tuned XGBoost     | 317.11682 | 230.31340 | 0.99732 |
+| Baseline LightGBM | 334.46769 | 247.02942 | 0.99702 |
+| Tuned LightGBM    | 368.71429 | 274.27937 | 0.99637 |
+
+The XGBoost model significantly benefited from hyperparameter tuning. Its RMSE reduced from 339.45 to 317.12, and its R-squared value slightly improved, indicating a better fit to the data. This suggests that the optimised hyperparameters effectively reduced the model's prediction errors.
+
+Surprisingly, the LightGBM model's performance degraded after tuning. Its RMSE went up from 334.47 to 368.71, and R-squared also decreased. This outcome suggests that the chosen hyperparameter search space or the tuning strategy might not have been suitable for LightGBM, or perhaps the default parameters were already quite robust for this dataset. Further investigation would be needed to understand why the tuned LightGBM model has performed worse.
+
+In conclusion, hyperparameter tuning proved highly effective for XGBoost, leading to a more accurate and robust predictive model. However, it has negatively impact the LightGBM's model performance, highlighting the importance of careful tuning strategy and potentially model-specific considerations in the optimisation process.
+
 # Next Steps (Future Work)
 * ~~**Feature Engineering:** Create new predictive features from the existing `DatetimeIndex` of the energy consumption data, including the extraction of components such as hour of the day, day of the week, month, quarter, year, and the creation of flags for weekends.~~
 * ~~**External Data Integration:** Source and incorporate historical temperature data corresponding to the PJM region to demonstrate the correlation between temperature and energy demand, and integrate features indicating national public holidays to exhibit distinct patterns of energy consumption.~~
 * ~~**Model Building:** Select suitable regression models for time series forecasting, such as XGBoost Regressor, LightGBM Regressor, and Facebook Prophet, train these models on the prepared training data, and perform an initial evaluation of their performance using metrics like Root Mean Squared Error (RMSE), Mean Absoluate Error (MAE), and R-squared ($R^2$) on the test set.~~
 * ~~**Advanced Feature Engineering:** Build upon the initial features by creating a comprehensive set of new, highly predictive features. This includes further leveraging cyclical time-based components e.g. interaction terms, generating more sophisticated lagged values of energy consumption, and implementing various rolling window statistics for both energy consumption and external temperature data.~~
-* **Hyperparameter Tuning & Optimisation:** Systematically tune the hyperparameters of selected regression models, XGBoost Regressor and LightGBM Regressor, using robust, time series-aware cross-validation strategies such as `TimeSeriesSplit` to achieve optimal predictive performance. This may involve using iterative search techniques or more advanced optimisation frameworks.
-* **Model Evaluation:** Conduct a comprehensive final evaluation of the optimised model performances using key metrics like Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), and R-squared ($R^2$) on the dedicated test set.
+* ~~**Hyperparameter Tuning & Optimisation:** Systematically tune the hyperparameters of selected regression models, XGBoost Regressor and LightGBM Regressor, using robust, time series-aware cross-validation strategies such as `TimeSeriesSplit` to achieve optimal predictive performance. This may involve using iterative search techniques or more advanced optimisation frameworks.~~
+* ~~**Model Evaluation:** Conduct a comprehensive final evaluation of the optimised model performances using key metrics like Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), and R-squared ($R^2$) on the dedicated test set.~~
 * **Advanced Model Exploration:** Investigate alternative time series forecasting models beyond gradient boosting, such as Ensemble Methods / Stacking or deep learning time series models like Long Short-Term Memory (LSTMs).
 * **Model Deployment:** Develop a simple and interactive web application to showcase the practical accessibility of the trained forecasting model.
