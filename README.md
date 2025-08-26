@@ -212,6 +212,27 @@ Surprisingly, the LightGBM model's performance degraded after tuning. Its RMSE w
 
 In conclusion, hyperparameter tuning proved highly effective for XGBoost, leading to a more accurate and robust predictive model. However, it has negatively impact the LightGBM's model performance, highlighting the importance of careful tuning strategy and potentially model-specific considerations in the optimisation process.
 
+### Phase 6: Advanced Model Exploration
+* **Objective:** Critically evaluate and compare the final stacking ensemble model against its base components, XGBoost and LightGBM, to confirm the efficacy of the stacking approach and determine the overall best-performing model for this time series forecasting problem.
+* **Key Activities:**
+  * Computed a suite of standard regression metrics, Root Mean Squared Error (RMSE), Mean Absoluate Error (MAE), and R-squared, for the tuned XGBoost, LightGBM, and the final stacking ensemble models on the test set.
+  * Consolidated all model performance metrics into a clear and concise summary table, allowing for a direct comparison of the individual models against the combined ensemble.
+  * Generated a visual plot that compares the final stacking ensemble's predictions against the actual values to visually demonstrate the model's high predictive accuracy, and created a histogram of the model's residuals to check for any systematic biases and confirm that prediction errors are randomly distributed.
+    ![Actual vs Predicted PJME_MW (Test Set)](images/ph6_actual_vs_predicted_final_model.png)
+    ![Distribution of Residuals](images/ph6_residual_distribution_final_model.png)
+
+**Model Performance Comparison**
+
+The multi-model stacking ensemble demonstrated a superior performance, outperforming the individual base models in all key metrics.
+
+| Model                      | RMSE   | MAE    | R-squared |
+|:---------------------------|--------|--------|-----------|
+| Tuned XGBoost              | 316.59 | 230.75 | 0.9973    |
+| Tuned LightGBM             | 392.32 | 292.28 | 0.9959    |
+| Advanced Stacking Ensemble | 316.10 | 230.63 | 0.9973    |
+
+The advanced stacking ensemble model proved to be the most accurate model, achieving the lowest RMSE and MAE, as well as the highest R-squared value. This outcome confirms the core hypothesis of the stacking approach: by leveraging the distinct predictive strengths of both the XGBoost and LightGBM models, the meta-model was able to produce a final prediction that was more robust and accurate than either base model alone. This final model represents the most robust solution for forecasting energy consumption within the dataset.
+
 # Next Steps (Future Work)
 * ~~**Feature Engineering:** Create new predictive features from the existing `DatetimeIndex` of the energy consumption data, including the extraction of components such as hour of the day, day of the week, month, quarter, year, and the creation of flags for weekends.~~
 * ~~**External Data Integration:** Source and incorporate historical temperature data corresponding to the PJM region to demonstrate the correlation between temperature and energy demand, and integrate features indicating national public holidays to exhibit distinct patterns of energy consumption.~~
@@ -219,5 +240,5 @@ In conclusion, hyperparameter tuning proved highly effective for XGBoost, leadin
 * ~~**Advanced Feature Engineering:** Build upon the initial features by creating a comprehensive set of new, highly predictive features. This includes further leveraging cyclical time-based components e.g. interaction terms, generating more sophisticated lagged values of energy consumption, and implementing various rolling window statistics for both energy consumption and external temperature data.~~
 * ~~**Hyperparameter Tuning & Optimisation:** Systematically tune the hyperparameters of selected regression models, XGBoost Regressor and LightGBM Regressor, using robust, time series-aware cross-validation strategies such as `TimeSeriesSplit` to achieve optimal predictive performance. This may involve using iterative search techniques or more advanced optimisation frameworks.~~
 * ~~**Model Evaluation:** Conduct a comprehensive final evaluation of the optimised model performances using key metrics like Root Mean Squared Error (RMSE), Mean Absolute Error (MAE), and R-squared ($R^2$) on the dedicated test set.~~
-* **Advanced Model Exploration:** Investigate alternative time series forecasting models beyond gradient boosting, such as Ensemble Methods / Stacking or deep learning time series models like Long Short-Term Memory (LSTMs).
+* ~~**Advanced Model Exploration:** Investigate alternative time series forecasting models beyond gradient boosting, such as Ensemble Methods / Stacking or deep learning time series models like Long Short-Term Memory (LSTMs).~~
 * **Model Deployment:** Develop a simple and interactive web application to showcase the practical accessibility of the trained forecasting model.
