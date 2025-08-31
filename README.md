@@ -202,13 +202,13 @@ The hyperparameter tuning process yielded varying degrees of improvement for the
 | Model             | RMSE      | MSE       | R^2     |
 |:------------------|:----------|:----------|:--------|
 | Baseline XGBoost  | 339.44611 | 248.72794 | 0.99693 |
-| Tuned XGBoost     | 317.11682 | 230.31340 | 0.99732 |
+| Tuned XGBoost     | 325.57486 | 237.37317 | 0.99717 |
 | Baseline LightGBM | 334.46769 | 247.02942 | 0.99702 |
-| Tuned LightGBM    | 368.71429 | 274.27937 | 0.99637 |
+| Tuned LightGBM    | 360.74994 | 265.79568 | 0.99653 |
 
-The XGBoost model significantly benefited from hyperparameter tuning. Its RMSE reduced from 339.45 to 317.12, and its R-squared value slightly improved, indicating a better fit to the data. This suggests that the optimised hyperparameters effectively reduced the model's prediction errors.
+The XGBoost model significantly benefited from hyperparameter tuning. Its RMSE reduced from 339.45 to 325.57, and its R-squared value slightly improved, indicating a better fit to the data. This suggests that the optimised hyperparameters effectively reduced the model's prediction errors.
 
-Surprisingly, the LightGBM model's performance degraded after tuning. Its RMSE went up from 334.47 to 368.71, and R-squared also decreased. This outcome suggests that the chosen hyperparameter search space or the tuning strategy might not have been suitable for LightGBM, or perhaps the default parameters were already quite robust for this dataset. Further investigation would be needed to understand why the tuned LightGBM model has performed worse.
+Surprisingly, the LightGBM model's performance degraded after tuning. Its RMSE went up from 334.47 to 360.75, and R-squared also decreased. This outcome suggests that the chosen hyperparameter search space or the tuning strategy might not have been suitable for LightGBM, or perhaps the default parameters were already quite robust for this dataset. Further investigation would be needed to understand why the tuned LightGBM model has performed worse.
 
 In conclusion, hyperparameter tuning proved highly effective for XGBoost, leading to a more accurate and robust predictive model. However, it has negatively impact the LightGBM's model performance, highlighting the importance of careful tuning strategy and potentially model-specific considerations in the optimisation process.
 
@@ -225,13 +225,17 @@ In conclusion, hyperparameter tuning proved highly effective for XGBoost, leadin
 
 The multi-model stacking ensemble demonstrated a superior performance, outperforming the individual base models in all key metrics.
 
-| Model                      | RMSE   | MAE    | R-squared |
-|:---------------------------|--------|--------|-----------|
-| Tuned XGBoost              | 316.59 | 230.75 | 0.9973    |
-| Tuned LightGBM             | 392.32 | 292.28 | 0.9959    |
-| Advanced Stacking Ensemble | 316.10 | 230.63 | 0.9973    |
+| Model                      | RMSE      | MAE       | R-squared  |
+|:---------------------------|-----------|-----------|------------|
+| Tuned XGBoost              | 409.84175 | 290.83314 | 0.99552    |
+| Tuned LightGBM             | 439.78358 | 330.68478 | 0.99484    |
+| Advanced Stacking Ensemble | 397.72299 | 292.56999 | 0.99578    |
 
 The advanced stacking ensemble model proved to be the most accurate model, achieving the lowest RMSE and MAE, as well as the highest R-squared value. This outcome confirms the core hypothesis of the stacking approach: by leveraging the distinct predictive strengths of both the XGBoost and LightGBM models, the meta-model was able to produce a final prediction that was more robust and accurate than either base model alone. This final model represents the most robust solution for forecasting energy consumption within the dataset.
+
+**Production Pipeline**
+
+The final trained models and feature engineering steps are saved into a single `production_pipeline.joblib` file. This allows for a clean and efficient deployment, where the web application can simply load this file to make new predictions without the need to retrain the models.
 
 # Next Steps (Future Work)
 * ~~**Feature Engineering:** Create new predictive features from the existing `DatetimeIndex` of the energy consumption data, including the extraction of components such as hour of the day, day of the week, month, quarter, year, and the creation of flags for weekends.~~
